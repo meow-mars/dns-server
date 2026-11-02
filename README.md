@@ -1,4 +1,4 @@
-## DNS Server Project
+# DNS Server Project
 
 ## Resource List  
 https://engineerhead.github.io/dns-server/  
