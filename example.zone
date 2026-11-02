@@ -1,0 +1,4 @@
+; name            ttl   class  type  data
+example.com       60    IN     A     192.0.2.1
+example.com       60    IN     A     192.0.2.2
+www.example.com   300   IN     A     192.0.2.3
