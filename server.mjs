@@ -45,6 +45,28 @@ async function processBindFile(filePath) {
     let soaLine = 0;
     let multiLineSoa = false;
     let containsTtl = false;
+
+    /**
+     * Parsing file line by line
+     * Replaces tabs and whitespaces with a single space ' '
+     * Locates the comment ; if there is any
+     * If ; is not at the start, separate and ignore the comment [right side]
+     */
+    for await (const line of rl) {  
+        if (line.length > 1){
+            let commentedLine = false;
+            let l = line.trim()
+             .replace(/\t/g, ' ')
+             .replace(/\s+/g, ' ');
+            let commentIndex = l.indexOf(';'); 
+            if (commentIndex != 0) {
+                let m = l.split(';');
+                l = m[0];
+            } else {
+                commentedLine = true;
+            }
+        }
+    }
 }
 
 server.bind(8053, '127.0.0.1');
