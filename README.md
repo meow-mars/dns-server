@@ -18,3 +18,6 @@ c00c 0001 0001 0000003c 0004 01020304                Answer
 ## Inputs  
 dig @127.0.0.1 -p 8053 example.com AAAA  
 dig @127.0.0.1 -p 8053 example.com  
+
+## Readings  
+https://www.cloudflare.com/learning/dns/dns-records/dns-soa-record/  
