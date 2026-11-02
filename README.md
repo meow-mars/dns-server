@@ -21,3 +21,15 @@ dig @127.0.0.1 -p 8053 example.com
 
 ## Readings  
 https://www.cloudflare.com/learning/dns/dns-records/dns-soa-record/  
+https://www.geeksforgeeks.org/linux-unix/dig-command-in-linux-with-examples/  
+https://medium.com/@sharma.sarthak222872/build-your-own-dns-server-in-node-js-from-scratch-264b328b6d00  
+
+## Header Structure [Adapted from @sharma.sarthak222872]  
+Bytes  
+0–1 → ID  
+2–3 → FLAGS  
+4–5 → QDCOUNT  
+6–7 → ANCOUNT  
+8–9 → NSCOUNT  
+10–11 → ARCOUNT  
+
