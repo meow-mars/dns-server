@@ -17,3 +17,7 @@ https://nodejs.org/api/buffer.html#buffer
 7070 8400 0001 0001 0000 0000                        Header  
 07 6578616d706c65 03 636f6d 00 0001 0001             Question  
 c00c 0001 0001 0000003c 0004 01020304                Answer  
+
+### Inputs  
+dig @127.0.0.1 -p 8053 example.com AAAA  
+dig @127.0.0.1 -p 8053 example.com  
