@@ -86,7 +86,35 @@ async function processBindFile(filePath) {
                 case '$INCLUDE':
                     break;
                 default: 
-                    
+                    /**
+                     * SOA Entry Record
+                     * @ IN SOA ns1.example.com. hostmaster.example.com. ( 2026110301 21600 3600 604800 86400 )
+                     * previousName: @ 
+                     * mname: The <domain-name> of the name server that was the original or primary source of data for this zone. e.g (ns1.example.com)
+                     * rname:  A <domain-name> which specifies the mailbox of the person responsible for this zone. e.g (hostmaster.example.com)
+                     * 
+                     * Definitions obtained from RFC1035 documentation [refer to README.md]
+                     */
+                    if (splittedLine.includes('SOA')){
+                        previousName = splittedLine[0];
+                        soa.mname = splittedLine[3];
+                        soa.rname = splittedLine[4];
+
+                        /**
+                         * Only applied to single line record, all record values are stored in parentheses
+                         * e.g ( 2026110301 21600 3600 604800 86400 )
+                         * serial: unsigned 32-bit version number of the original copy of the zone 
+                         * refresh: 32-bit time interval before the zone should be refreshed
+                         * retry: 32-bit time interval relapse time before zone should be retried upon refresh fail
+                         * expire: 32-bit time value that specifies the upper time limit interval a zone has before it is no longer authoritative
+                         * 
+                         * Definitions obtained from RFC1035 documentation [refer to README.md]
+                         */
+                        if (splittedLine.includes(')')){
+                            soa.serial = splittedLine[6];
+                            soa.
+                        }
+                    }
             }
         }
 
