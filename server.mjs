@@ -51,6 +51,7 @@ async function processBindFile(filePath) {
      * Replaces tabs and whitespaces with a single space ' '
      * Locates the comment ; if there is any
      * If ; is not at the start, separate and ignore the comment [right side]
+     * If ; is at the start, it means that whole line is commented, hence commentedLine is true [IMPORTANT]
      */
     for await (const line of rl) {  
         if (line.length > 1){
@@ -66,6 +67,29 @@ async function processBindFile(filePath) {
                 commentedLine = true;
             }
         }
+
+        if (!commentedLine) {
+            let splittedLine = l.split(' ');
+            /**
+             * Extracting details from DNS file entry
+             * e.g $ORIGIN example.com.
+             * switch-case used to determine properties of entry
+             * variables are defined at start - look line 26-29
+             */
+            switch (splittedLine[0]){
+                case '$ORIGIN':
+                    origin = splittedLine[1];
+                    break;
+                case '$TTL':
+                    ttl = splittedLine[1];
+                    break;
+                case '$INCLUDE':
+                    break;
+                default: 
+                    
+            }
+        }
+
     }
 }
 
