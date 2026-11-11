@@ -101,7 +101,7 @@ async function processBindFile(filePath) {
                         soa.rname = splittedLine[4];
 
                         /**
-                         * Only applied to single line record, all record values are stored in parentheses
+                         * Only applied to single line record, all record values are stored in parentheses, detects specifically for end-bracket ')'
                          * e.g ( 2026110301 21600 3600 604800 86400 )
                          * serial: unsigned 32-bit version number of the original copy of the zone 
                          * refresh: 32-bit time interval before the zone should be refreshed
@@ -112,7 +112,16 @@ async function processBindFile(filePath) {
                          */
                         if (splittedLine.includes(')')){
                             soa.serial = splittedLine[6];
-                            soa.
+                            soa.refresh = splittedLine[7];
+                            soa.retry = splittedLine[8];
+                            soa.expire = splittedLine[9];
+                            soa.title = splittedLine[10];
+                        }
+
+                        else{
+                            // Setting multiline mode to true
+                            multiLineSoa = true;
+                            soaLine++;
                         }
                     }
             }
