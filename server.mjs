@@ -115,12 +115,50 @@ async function processBindFile(filePath) {
                             soa.refresh = splittedLine[7];
                             soa.retry = splittedLine[8];
                             soa.expire = splittedLine[9];
-                            soa.title = splittedLine[10];
+                            soa.ttl = splittedLine[10];
                         }
 
                         else{
                             // Setting multiline mode to true
                             multiLineSoa = true;
+                            soaLine++;
+                        }
+
+                        /**
+                         * Multiline SOA record handling
+                         * soaLine starts with 0, on first multiline run, increments to 1
+                         * no case for 1, this is to check for endbracket in the current iteration, 
+                         * counter is then iterated to 2 and so on until an endbracket is found, 
+                         * multiline flag is then switched off
+                         */
+                        if (multiLineSoa) {
+                            switch (soaLine){
+                                case 2:
+                                    soa.serial = splittedLine[0];
+                                    break;
+                                case 3: 
+                                    soa.refresh = splittedLine[0];
+                                    break;
+                                case 4: 
+                                    soa.retry = splittedLine[0];
+                                    break;
+                                case 5: 
+                                    soa.expire = splittedLine[0];
+                                    break;
+                                case 6:
+                                    soa.ttl = splittedLine[0];
+                                    break;
+                                default:
+                                    // Skip
+                                    break;
+                            }
+
+                            /**
+                             * Switching the flag off
+                             */
+                            if (splittedLine.includes(')')){
+                                multiLineSoa = false;
+                            }
                             soaLine++;
                         }
                     }
