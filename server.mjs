@@ -62,75 +62,75 @@ async function processBindFile(filePath) {
             let commentIndex = l.indexOf(';'); 
             if (commentIndex != 0) {
                 let m = l.split(';');
-                l = m[0];
+                l = m[0].trim();;
             } else {
                 commentedLine = true;
             }
-        }
 
-        if (!commentedLine) {
-            let splittedLine = l.split(' ');
-            /**
-             * Extracting details from DNS file entry
-             * e.g $ORIGIN example.com.
-             * switch-case used to determine properties of entry
-             * variables are defined at start - look line 26-29
-             */
-            switch (splittedLine[0]){
-                case '$ORIGIN':
-                    origin = splittedLine[1];
-                    break;
-                case '$TTL':
-                    ttl = splittedLine[1];
-                    break;
-                case '$INCLUDE':
-                    break;
-                default: 
-                    /**
-                     * SOA Entry Record
-                     * @ IN SOA ns1.example.com. hostmaster.example.com. ( 2026110301 21600 3600 604800 86400 )
-                     * previousName: @ 
-                     * mname: The <domain-name> of the name server that was the original or primary source of data for this zone. e.g (ns1.example.com)
-                     * rname:  A <domain-name> which specifies the mailbox of the person responsible for this zone. e.g (hostmaster.example.com)
-                     * 
-                     * Definitions obtained from RFC1035 documentation [refer to README.md]
-                     */
-                    if (splittedLine.includes('SOA')){
-                        previousName = splittedLine[0];
-                        soa.mname = splittedLine[3];
-                        soa.rname = splittedLine[4];
-
+            if (!commentedLine) {
+                let splittedLine = l.split(' ');
+                /**
+                 * Extracting details from DNS file entry
+                 * e.g $ORIGIN example.com.
+                 * switch-case used to determine properties of entry
+                 * variables are defined at start - look line 26-29
+                 */
+                switch (splittedLine[0]){
+                    case '$ORIGIN':
+                        origin = splittedLine[1];
+                        break;
+                    case '$TTL':
+                        ttl = splittedLine[1];
+                        break;
+                    case '$INCLUDE':
+                        break;
+                    default: 
                         /**
-                         * Only applied to single line record, all record values are stored in parentheses, detects specifically for end-bracket ')'
-                         * e.g ( 2026110301 21600 3600 604800 86400 )
-                         * serial: unsigned 32-bit version number of the original copy of the zone 
-                         * refresh: 32-bit time interval before the zone should be refreshed
-                         * retry: 32-bit time interval relapse time before zone should be retried upon refresh fail
-                         * expire: 32-bit time value that specifies the upper time limit interval a zone has before it is no longer authoritative
+                         * SOA Entry Record
+                         * @ IN SOA ns1.example.com. hostmaster.example.com. ( 2026110301 21600 3600 604800 86400 )
+                         * previousName: @ 
+                         * mname: The <domain-name> of the name server that was the original or primary source of data for this zone. e.g (ns1.example.com)
+                         * rname:  A <domain-name> which specifies the mailbox of the person responsible for this zone. e.g (hostmaster.example.com)
                          * 
                          * Definitions obtained from RFC1035 documentation [refer to README.md]
                          */
-                        if (splittedLine.includes(')')){
-                            soa.serial = splittedLine[6];
-                            soa.refresh = splittedLine[7];
-                            soa.retry = splittedLine[8];
-                            soa.expire = splittedLine[9];
-                            soa.ttl = splittedLine[10];
-                        }
-
-                        else{
-                            // Setting multiline mode to true
-                            multiLineSoa = true;
-                            soaLine++;
+                        if (splittedLine.includes('SOA')){
+                            previousName = splittedLine[0];
+                            soa.mname = splittedLine[3];
+                            soa.rname = splittedLine[4];
+    
+                            /**
+                             * Only applied to single line record, all record values are stored in parentheses, detects specifically for end-bracket ')'
+                             * e.g ( 2026110301 21600 3600 604800 86400 )
+                             * serial: unsigned 32-bit version number of the original copy of the zone 
+                             * refresh: 32-bit time interval before the zone should be refreshed
+                             * retry: 32-bit time interval relapse time before zone should be retried upon refresh fail
+                             * expire: 32-bit time value that specifies the upper time limit interval a zone has before it is no longer authoritative
+                             * 
+                             * Definitions obtained from RFC1035 documentation [refer to README.md]
+                             */
+                            if (splittedLine.includes(')')){
+                                soa.serial = splittedLine[6];
+                                soa.refresh = splittedLine[7];
+                                soa.retry = splittedLine[8];
+                                soa.expire = splittedLine[9];
+                                soa.ttl = splittedLine[10];
+                            }
+    
+                            else{
+                                // Setting multiline mode to true
+                                multiLineSoa = true;
+                                soaLine++;
+                            }
                         }
 
                         /**
-                         * Multiline SOA record handling
-                         * soaLine starts with 0, on first multiline run, increments to 1
-                         * no case for 1, this is to check for endbracket in the current iteration, 
-                         * counter is then iterated to 2 and so on until an endbracket is found, 
-                         * multiline flag is then switched off
-                         */
+                             * Multiline SOA record handling
+                             * soaLine starts with 0, on first multiline run, increments to 1
+                             * no case for 1, this is to check for endbracket in the current iteration, 
+                             * counter is then iterated to 2 and so on until an endbracket is found, 
+                             * multiline flag is then switched off
+                             */
                         if (multiLineSoa) {
                             switch (soaLine){
                                 case 2:
@@ -161,26 +161,28 @@ async function processBindFile(filePath) {
                             }
                             soaLine++;
                         }
-                    }
-            }
-
-            /**
-             * Resource Record Handling - TYPE values
-             * [Refer to 3.2.2 TYPE values in RFC 1035]
-             */
-            recordsType.forEach(type => {
-                if (splittedLine.includes(type)){
-                    let recordType = type;
-                    let resourceRecord;
-                    /**
-                     * TO-DO: Process the record
-                     */
                 }
-            })
+    
+                /**
+                 * Resource Record Handling - TYPE values
+                 * [Refer to 3.2.2 TYPE values in RFC 1035]
+                 */
+                recordsType.forEach(type => {
+                    if (splittedLine.includes(type)){
+                        let recordType = type;
+                        let resourceRecord;
+                        /**
+                         * TO-DO: Process the record
+                         */
+                    }
+                })
+            }
         }
 
     }
 }
+
+
 
 server.bind(8053, '127.0.0.1');
 
