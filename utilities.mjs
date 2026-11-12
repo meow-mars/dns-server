@@ -51,11 +51,23 @@ export function processResourceRecord(splittedLine, previousName, previousTtl, o
      */
     for (const element of before){
         if (parseInt(element)){
-            ttl = element;
+            if (!ttl) ttl = element;
+            else {
+                console.warn(`Duplicated TTL detected: ${element}`);
+                return null;
+            }
         } else if (element === 'IN'){
-            recordClass = element;
+            if (!recordClass) recordClass = element;
+            else {
+                console.warn(`Duplicated record class detected: ${element}`);
+                return null;
+            }
         } else {
-            name = element;
+            if (!name) name = element;
+            else {
+                console.warn(`Duplicated name detected: ${element}`);
+                return null;
+            }
         }
     }
 }
