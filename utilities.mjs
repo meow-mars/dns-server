@@ -41,4 +41,21 @@ export function processResourceRecord(splittedLine, previousName, previousTtl, o
         console.warn(`Before array's length more than 3: ${splittedLine}`);
         return null;
     }
+    let name;
+    let ttl;
+    let recordClass;
+    /**
+     * TTL: detection using parseInt
+     * recordClass: IN
+     * other: name
+     */
+    for (const element of before){
+        if (parseInt(element)){
+            ttl = element;
+        } else if (element === 'IN'){
+            recordClass = element;
+        } else {
+            name = element;
+        }
+    }
 }
