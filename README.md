@@ -33,3 +33,60 @@ Bytes
 8–9 → NSCOUNT  
 10–11 → ARCOUNT  
 
+## Field Count: Resource Record processing [Adapted from 5.1 Format - RFC 1035]
+
+### Record format
+RFC 1035 allows a resource record to be written in either of these forms:
+
+```text
+[<TTL>] [<class>] <type> <RDATA>
+[<class>] [<TTL>] <type> <RDATA>
+```
+
+Items in square brackets are optional:
+
+| Part | Required? | Example |
+|---|---|---|
+| Name | Optional | `www`, `@` |
+| TTL | Optional | `300` |
+| Class | Optional | `IN` |
+| Type | Required | `A`, `MX` |
+| Data | Required | `192.0.2.3` |
+
+### Approach: find the type first
+The guide this project is based on works out which parts a line includes by counting its items. That breaks when the TTL and class swap places, when the class is left out, and for MX records, whose priority looks just like a TTL.
+
+Instead, this parser finds the record's type first and splits the line around it:
+
+```text
+mail   300   IN   MX   10   mail.example.com.
+└──── before ────┘type └────── after ───────┘
+```
+
+- **Before the type:** The name, TTL and class, in any order.
+- **After the type:** The data.
+
+This works because, as RFC 1035 puts it, "type and class mnemonics are disjoint, the parse is unique". No word is both a type and a class, so each item can be identified by what it looks like:
+
+| Item looks like | It's treated as |
+|---|---|
+| A whole number | TTL |
+| `IN` | Class |
+| Anything else | Name |
+
+### Filling in missing parts
+| Part | If it's missing |
+|---|---|
+| Name | Copied from the last stated name. A line starting with a blank "is assumed to be owned by the last stated owner" (RFC 1035) |
+| TTL | Taken from `$TTL`, which applies to every record without its own TTL. Without `$TTL`, the last stated TTL is used |
+| Class | RFC 1035 uses the last stated class. This server only supports `IN`, so a missing class is treated as `IN` |
+
+### Reading the data
+| Type | Data |
+|---|---|
+| `A` | One IPv4 address |
+| `NS` | One name server |
+| `CNAME` | One domain name |
+| `MX` | A priority, then the mail server |
+
+A line with the wrong number of items is skipped and a warning is printed.
