@@ -163,6 +163,20 @@ async function processBindFile(filePath) {
                         }
                     }
             }
+
+            /**
+             * Resource Record Handling - TYPE values
+             * [Refer to 3.2.2 TYPE values in RFC 1035]
+             */
+            recordsType.forEach(type => {
+                if (splittedLine.includes(type)){
+                    let recordType = type;
+                    let resourceRecord;
+                    /**
+                     * TO-DO: Process the record
+                     */
+                }
+            })
         }
 
     }
