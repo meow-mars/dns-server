@@ -45,12 +45,12 @@ export function processResourceRecord(splittedLine, previousName, previousTtl, o
     let ttl;
     let recordClass;
     /**
-     * TTL: detection using parseInt
+     * TTL: detection using regex
      * recordClass: IN
      * other: name
      */
     for (const element of before){
-        if (parseInt(element)){
+        if (/^\d+$/.test(element)){
             if (!ttl) ttl = element;
             else {
                 console.warn(`Duplicated TTL detected: ${element}`);
