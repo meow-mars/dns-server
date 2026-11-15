@@ -70,4 +70,35 @@ export function processResourceRecord(splittedLine, previousName, previousTtl, o
             }
         }
     }
+
+    /**
+     * Fallbacks
+     */
+    name = name ?? previousName ?? origin;
+    recordClass = recordClass ?? 'IN';
+    /**
+     * TTL fallback to defaultTtl
+     * defaultTtl fallback to previousTtl if does not exist
+     */
+    ttl = (ttl ?? defaultTtl) ?? previousTtl; 
+
+    /**
+     * Updating fallback variable
+     */
+    if (name) previousName = name;
+    if (ttl === undefined){
+        console.warn('TTL is undefined');
+        return null;
+    }
+
+    /**
+     * TTL conversion: string -> int
+     */
+    ttl = parseInt(ttl);
+    if(Number.isNaN(ttl)) {
+        console.warn(`TTL cannot be parsed to integer: ${splittedLine}`)
+        return null;
+    }
+    previousTtl = ttl;
+
 }
