@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import { writeLog } from "./utilities.mjs";
 import fs from 'fs';
 import readline from 'readline';
+import { processResourceRecord } from "./utilities.mjs";
 
 const server = dgram.createSocket('udp4');
 
@@ -167,19 +168,24 @@ async function processBindFile(filePath) {
                  * Resource Record Handling - TYPE values
                  * [Refer to 3.2.2 TYPE values in RFC 1035]
                  */
-                recordsType.forEach(type => {
-                    if (splittedLine.includes(type)){
-                        let recordType = type;
-                        let resourceRecord;
-                        /**
-                         * TO-DO: Process the record
-                         */
-                    }
-                })
+                const result = processResourceRecord(splittedLine, previousName, previousTtl, origin, ttl);
+                /**
+                 * Skip line
+                 */
+                if (!result) continue;
+                const [record] = result;
+                previousName = result[1];
+                previousTtl = result[2];
+
+                /**
+                 * Push record to specific array
+                 */
+                records[record.type].push(record);
             }
         }
 
     }
+    return records;
 }
 
 
