@@ -122,4 +122,15 @@ export function processResourceRecord(splittedLine, previousName, previousTtl, o
         return null;
     }
 
+    /**
+     * Record object
+     */
+    const record = {
+        name: name,
+        ttl: ttl,
+        class: recordClass,
+        type: type,
+        data: data,
+        priority: priority
+    };
 }
