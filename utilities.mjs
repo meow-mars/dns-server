@@ -87,7 +87,7 @@ export function processResourceRecord(splittedLine, previousName, previousTtl, o
      */
     if (name) previousName = name;
     if (ttl === undefined){
-        console.warn('TTL is undefined');
+        console.warn(`TTL is undefined: ${splittedLine}`);
         return null;
     }
 
@@ -100,5 +100,26 @@ export function processResourceRecord(splittedLine, previousName, previousTtl, o
         return null;
     }
     previousTtl = ttl;
+
+    /**
+     * Processing 'after'
+     * Any types other than MX should have only 1 item inside: data
+     * For MX: priority + data
+     */
+    let data;
+    let priority;
+    if (type === 'MX' && after.length === 2){
+        if (!/^\d+$/.test(after[0])){
+            console.warn(`Priority is not a digit`);
+            return null;
+        }
+        priority = parseInt(after[0]);
+        data = after[1];
+    } else if (type !== 'MX' && after.length === 1) {
+        data = after[0];
+    } else {
+        console.warn(`Resource record of type: ${type} has an invalid number of item in the after field: ${after.length}`);
+        return null;
+    }
 
 }
