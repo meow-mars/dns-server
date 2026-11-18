@@ -188,8 +188,14 @@ async function processBindFile(filePath) {
     return records;
 }
 
-
-
+/**
+ * node server.mjs [insert file path]
+ */
+const zoneFile = process.argv[2] ?? 'zones/example.com.zone';
+// Logging purpose
+console.log(`Loading zonefile path: ${zoneFile}`);
+//
+const records = await processBindFile(zoneFile);
 server.bind(8053, '127.0.0.1');
 
 server.on('error', (error) => {
