@@ -133,4 +133,6 @@ export function processResourceRecord(splittedLine, previousName, previousTtl, o
         data: data,
         priority: priority
     };
+
+    return [record, previousName, previousTtl];
 }
