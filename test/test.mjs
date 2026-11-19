@@ -170,11 +170,56 @@ const tests = [
 ];
 
 /**
+ * toFullName tests
+ * Each one checks that a zone file name becomes the full name
+ * the server compares against queries: no trailing dot, lowercase
+ */
+const nameTests = [
+    {
+        label: '@ becomes the origin',
+        name: '@',
+        origin: 'example.com.',
+        want: 'example.com',
+    },
+    {
+        label: 'Short name gets the origin added',
+        name: 'www',
+        origin: 'example.com.',
+        want: 'www.example.com',
+    },
+    {
+        label: 'Name ending in a dot is already full',
+        name: 'mail.other.com.',
+        origin: 'example.com.',
+        want: 'mail.other.com',
+    },
+    {
+        label: 'Capitals in the name and origin are lowercased',
+        name: 'WWW',
+        origin: 'Example.COM.',
+        want: 'www.example.com',
+    },
+    {
+        label: 'Origin without a trailing dot',
+        name: 'www',
+        origin: 'example.com',
+        want: 'www.example.com',
+    },
+    {
+        label: 'Deeper short name',
+        name: 'api.v2',
+        origin: 'example.com.',
+        want: 'api.v2.example.com',
+    },
+];
+
+/**
  * Run every test and print PASS or FAIL
  */
 let passed = 0;
 let failed = 0;
 
+console.log('--- processResourceRecord ---');
 for (const test of tests) {
     const a = { ...DEFAULTS, ...test.args };
     const got = processResourceRecord(test.line, a.previousName, a.previousTtl, a.origin, a.defaultTtl);
@@ -192,5 +237,23 @@ for (const test of tests) {
     }
 }
 
-console.log(`\n${passed} passed, ${failed} failed, ${tests.length} total`);
+console.log('\n--- toFullName ---');
+for (const test of nameTests) {
+    const got = toFullName(test.name, test.origin);
+
+    try {
+        assert.strictEqual(got, test.want);
+        console.log(`PASS  ${test.label}`);
+        passed++;
+    } catch {
+        console.log(`FAIL  ${test.label}`);
+        console.log(`      toFullName('${test.name}', '${test.origin}')`);
+        console.log('      expected:', test.want);
+        console.log('      got:     ', got);
+        failed++;
+    }
+}
+
+const total = tests.length + nameTests.length;
+console.log(`\n${passed} passed, ${failed} failed, ${total} total`);
 if (failed > 0) process.exitCode = 1;
