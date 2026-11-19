@@ -3,7 +3,7 @@ import { Buffer } from "node:buffer";
 import { writeLog } from "./utilities.mjs";
 import fs from 'fs';
 import readline from 'readline';
-import { processResourceRecord } from "./utilities.mjs";
+import { processResourceRecord, toFullName } from "./utilities.mjs";
 
 const server = dgram.createSocket('udp4');
 
@@ -178,6 +178,11 @@ async function processBindFile(filePath) {
                 previousTtl = result[2];
 
                 /**
+                 * Implementing fullname
+                 */
+                record.name = toFullName(record.name, origin);
+
+                /**
                  * Push record to specific array
                  */
                 records[record.type].push(record);
@@ -197,6 +202,11 @@ console.log(`Loading zonefile path: ${zoneFile}`);
 //
 const records = await processBindFile(zoneFile);
 server.bind(8053, '127.0.0.1');
+
+/**
+ * Logging records - delete comment to check
+ */
+// console.log(records['A']);
 
 server.on('error', (error) => {
     console.error(`Server Error: \n${error.stack}`);
