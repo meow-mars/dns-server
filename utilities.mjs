@@ -11,6 +11,31 @@ export function writeLog(domainLabel, type, rinfo){
     }
 }
 
+/**
+ * Name matching function
+ * Name in query needs to match the name in records
+ * 
+ * Known limitation: Zone file with no $ORIGIN would crash
+ */
+export function toFullName(name, origin){
+    let fullName;
+    if (name === '@'){
+        fullName = origin;  
+    } else if (name.at(-1) === '.'){ // Name is already full
+        fullName = name;
+    } else {
+        fullName = name+'.'+origin;
+    }
+
+    /**
+     * Remove trailing dot and lowercasing result
+     */
+    if (fullName.at(-1) === '.') fullName = fullName.slice(0, -1);
+    fullName = fullName.toLowerCase();
+
+    return fullName;
+}
+
 export function processResourceRecord(splittedLine, previousName, previousTtl, origin, defaultTtl){
     
     /**
